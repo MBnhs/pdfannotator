@@ -128,6 +128,7 @@ class mod_pdfannotator_renderer extends plugin_renderer_base {
             $overviewtab,
             $this->pdfannotator_create_tab($baseurl, 'view', 'document', $pdfannotatorname),
             $this->pdfannotator_create_tab($baseurl, 'statistic', 'statistic'),
+            $this->pdfannotator_create_tab($baseurl, 'statistic', 'statistic')
         );
         return $this->tabtree($level1, $selected, $inactive);
     }

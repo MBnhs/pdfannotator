@@ -416,6 +416,7 @@ $string['showmore'] = 'more';
 $string['slotdatetimelabel'] = 'Date and time';
 $string['startDiscussion'] = 'Start a discussion';
 $string['statistic'] = 'Statistics';
+$string['engagementlevels'] = 'Engagement levels';
 $string['strftimedatetime'] = '%d %b %Y, %I:%M %p';
 $string['strikeout'] = 'Strikeout text and add a comment.';
 $string['studentdrawingforbidden'] = 'This annotator does not support drawings for your user role.';
