@@ -130,12 +130,12 @@ answer: marked as correct answer"/>
         <KEY NAME="annotationid" TYPE="foreign" FIELDS="annotationid" REFTABLE="annotationsneu" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="pdfannotator_interaction" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="pdfannotator_readings" COMMENT="Default comment for the table, please edit me">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="interactiondatetime" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="start" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="end" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="pdfannotatorid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="interactiontype" TYPE="char" LENGTH="15" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
