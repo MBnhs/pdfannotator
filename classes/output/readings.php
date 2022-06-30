@@ -27,7 +27,7 @@
 
 namespace mod_pdfannotator\output;
 
-use pdfannotator_statistics;
+use pdfannotator_readings;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,11 +35,9 @@ defined('MOODLE_INTERNAL') || die();
  * The purpose of this script is to collect the output data for the template and
  * make it available to the renderer.
  */
-class statistics implements \renderable, \templatable {
+class readings implements \renderable, \templatable {
 
-    private $isteacher;
     private $tabledata;
-    private $readingid;
 
     /**
      * Constructor of renderable for statistics tab.
@@ -48,18 +46,15 @@ class statistics implements \renderable, \templatable {
      * @param object $capabilities Some of the capabilities the user has-
      * @param int $id Course module id
      */
-    public function __construct($annotatorid, $courseid, $capabilities, $id) {
+    public function __construct() {
         global $USER, $PAGE;
-        $userid = $USER->id;
-        $this->isteacher = $capabilities->viewteacherstatistics;
+        
 
-        $statistics = new pdfannotator_statistics($courseid, $annotatorid, $userid, $this->isteacher);
+        $readings = new pdfannotator_readings();
 
-        $this->tabledata = $statistics->get_tabledata();
+        $this->tabledata = $readings->get_tabledata();
 
-        $params = $statistics->get_chartdata();
-        $PAGE->requires->js_init_call('addDropdownNavigation', array($capabilities, $id), true);
-        $PAGE->requires->js_init_call('setCharts', $params, true);
+        
     }
 
     /**
@@ -71,12 +66,9 @@ class statistics implements \renderable, \templatable {
     public function export_for_template(\renderer_base $output) {
 
         $data = [];
-        $data['isteacher'] = $this->isteacher;
+        
         $data['tabledata'] = $this->tabledata;
 
-        session_start();
-        $data['readingid'] = $_SESSION["readingid"]; 
-        echo $_SESSION["readingid"];
         return $data;
     }
 

@@ -65,6 +65,8 @@ function pdfannotator_display_embed($pdfannotator, $cm, $course, $file, $page = 
     $PAGE->requires->js(new moodle_url("/mod/pdfannotator/shared/textclipper.js"));
     $PAGE->requires->js(new moodle_url("/mod/pdfannotator/shared/index.js?ver=00014"));
     $PAGE->requires->js(new moodle_url("/mod/pdfannotator/shared/locallib.js?ver=00003"));
+    //$PAGE->requires->js(new moodle_url("/mod/pdfannotator/shared/activity.js"));
+    $PAGE->requires->js(new moodle_url("/mod/pdfannotator/shared/reading.js"));
 
     // Pass parameters from PHP to JavaScript.
 
@@ -99,6 +101,21 @@ function pdfannotator_display_embed($pdfannotator, $cm, $course, $file, $page = 
     pdfannotator_print_intro($pdfannotator, $cm, $course);
 
     echo $OUTPUT->footer();
+
+    $date = new DateTime();
+
+    $obj = new stdClass();
+    $obj->start = $date->getTimestamp();
+    $obj->end = '';
+    $obj->pdfannotatorid = $pdfannotator->id;
+    
+    //echo gmdate("Y-m-d\TH:i:s\Z", $obj->start);
+
+    global $DB;
+    $readingid = $DB->insert_record('pdfannotator_readings', $obj, true, false);
+    session_start();
+    $_SESSION["readingid"]=$readingid;
+     
     die;
 }
 

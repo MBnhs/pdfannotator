@@ -22,6 +22,7 @@
  */
 
 use mod_pdfannotator\output\statistics;
+use mod_pdfannotator\output\readings;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -476,6 +477,26 @@ if ($action === 'statistic') {
     $capabilities->viewteacherstatistics = has_capability('mod/pdfannotator:viewteacherstatistics', $context);
 
     echo $myrenderer->render_statistic(new statistics($cm->instance, $course->id, $capabilities, $id));
+}
+
+/* * ********************************************** Display readings *********************************************** */
+
+if ($action === 'readings') {
+
+    require_once($CFG->dirroot . '/mod/pdfannotator/model/readings.class.php');
+
+    echo $myrenderer->pdfannotator_render_tabs($taburl, $pdfannotator->name, $context, $action);
+    $PAGE->set_title("readingsview");
+    echo $OUTPUT->heading(get_string('activities', 'pdfannotator'));
+
+    // Give javascript access to the language string repository.
+    $stringman = get_string_manager();
+    $strings = $stringman->load_component_strings('pdfannotator', 'en'); // Method gets the strings of the language files.
+    
+    $myrenderer = $PAGE->get_renderer('mod_pdfannotator');
+      
+    
+    echo $myrenderer->render_readings(new readings());
 }
 
 /* * ***************************************** Display form for reporting a comment  ******************************************** */

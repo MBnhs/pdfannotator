@@ -1,4 +1,48 @@
 
+// function readingWatcher(){
+    
+//     //Setup the setInterval method to run
+//     //every second. 1000 milliseconds = 1 second.
+//     setInterval(function(){
+//         console.log("Atualizando timestamp end de leitura na base");
+         
+//         return $.ajax({
+//             type: "POST",
+//             url: "action.php",
+//             data: { "action": 'updatereading'}
+//         }).then(function(data){
+//             data = JSON.parse(data);
+
+//             if(data.status === "success") {
+                
+//                 return data;
+
+//             } else if (data.status === 'error') {
+//                     notification.addNotification({
+//                         message: data.reason,
+//                         type: "error"
+//                     });
+//                     if (data.log){
+//                         console.error(data.log);
+//                     }
+//                     setTimeout(function(){
+//                     let notificationpanel = document.getElementById("user-notifications");
+//                     while (notificationpanel.hasChildNodes()) {  
+//                         notificationpanel.removeChild(notificationpanel.firstChild);
+//                     } 
+//                     }, 6000);
+//             }
+//             return {'status':'error'};
+//         });
+        
+
+//     }, 5000);
+// }
+
+// readingWatcher();
+
+
+
 /**
  * Function removes the spacing between tab navigation and document tool bar
  *
@@ -525,6 +569,16 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                 });
             },
 
+            updateReading(pageNumber, pattern){
+                return $.ajax({
+                    type: "POST",
+                    url: "action.php",
+                    data: { "page_Number": pageNumber, "action": 'getQuestions', "pattern": pattern, sesskey: M.cfg.sesskey}
+                }).then(function(data){
+                    return JSON.parse(data);
+                });
+            },
+
             /**
              * Get all information about an annotation. This function only retrieves information about annotations of types 'drawing' and 'textbox'.
              * @param {type} documentId
@@ -1008,7 +1062,8 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
               if(_annoid !== null){
                   UI.pickAnnotation(_page,_annoid,_commid);
               }else{
-                  UI.renderAllQuestions(documentId, _page);
+                  renderQuestions();
+                //   UI.registerReading(documentId, _page);
               }
               
               setTimeout(UI.loadNewAnnotations, 5000);
@@ -1025,6 +1080,15 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
           });
 	}
         
+    function renderQuestions() {
+
+        setInterval(function(){
+            UI.renderAllQuestions(documentId, _page);
+        }, 5000);
+
+
+        
+    }
 	render();
         
         //initialize button allQuestions
@@ -3539,6 +3603,10 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                                 (0,_abstractFunction2.default)('getQuestions');
                             }
                         },
+                        {key:'updateReading',value:function updateReading(documentId,pageNumber,pattern){
+                                (0,_abstractFunction2.default)('updateReading');
+                            }
+                        },
                         /**
                         * Get all the questions of one page
                         *
@@ -3550,6 +3618,11 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                                 (0,_abstractFunction2.default)('getQuestions');
                             }
                         },
+
+                        {key:'__updateReading',value:function updateReading(documentId,pageNumber,pattern){
+                            (0,_abstractFunction2.default)('updateReading');
+                        }
+                    },
                        /**
                         * Add a new comment
                         *
@@ -4978,7 +5051,7 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             var _shortText = __webpack_require__(39);
             var _newAnnotations = __webpack_require__(40);
             var _ajaxloader=__webpack_require__(36);
-            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
+            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, registerReading: _questionsRenderer.registerReading, shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
             module.exports=exports['default'];
     /***/},
     /** 29 */
@@ -6846,6 +6919,7 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             Object.defineProperty(exports,"__esModule",{value:true});
             exports.renderQuestions=renderQuestions;
             exports.renderAllQuestions = renderAllQuestions;
+            exports.registerReading = registerReading;
             var _event=__webpack_require__(4);
             var _shortText=__webpack_require__(39);     
             var _PDFJSAnnotate=__webpack_require__(1);
@@ -6969,6 +7043,7 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
              * @return {undefined}
              */
             function renderAllQuestions (documentId) {
+                console.log("teste do all questions");
                 _PDFJSAnnotate2.default.getStoreAdapter().getQuestions(documentId).then(function(questions){
                     let container = document.querySelector('.comment-list-container');
                     let title = $('#comment-wrapper > h4')[0];
@@ -7028,6 +7103,20 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                         type: "error"
                     });
                 }); 
+            }
+
+            function registerReading () {
+                // console.log("registerReading");
+                // _PDFJSAnnotate2.default.getStoreAdapter().getQuestions(documentId).then(function(questions){
+                    
+                    
+                // }, function (err){
+                //     notification.addNotification({
+                //         message: M.util.get_string('error:registerReading', 'pdfannotator'),
+                //         type: "error"
+                //     });
+                // });
+                
             }
         },
     /* 39 *//*OWN Module! To shorten a specific text*/

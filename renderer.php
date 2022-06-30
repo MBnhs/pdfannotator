@@ -44,6 +44,16 @@ class mod_pdfannotator_renderer extends plugin_renderer_base {
     }
 
     /**
+     *
+     * @param \templatable $readings
+     * @return type
+     */
+    public function render_readings(\templatable $readings) {
+        $data = $readings->export_for_template($this);
+        return $this->render_from_template('mod_pdfannotator/readings', $data);
+    }
+
+    /**
      * renders dropdown-actionmenu. Currently used on overview in the categories "answers" and "reports".
      * @param \templatable $dropdownmenu
      * @return type
@@ -128,7 +138,7 @@ class mod_pdfannotator_renderer extends plugin_renderer_base {
             $overviewtab,
             $this->pdfannotator_create_tab($baseurl, 'view', 'document', $pdfannotatorname),
             $this->pdfannotator_create_tab($baseurl, 'statistic', 'statistic'),
-            $this->pdfannotator_create_tab($baseurl, 'statistic', 'statistic')
+            $this->pdfannotator_create_tab($baseurl, 'readings', 'readings')
         );
         return $this->tabtree($level1, $selected, $inactive);
     }
