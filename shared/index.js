@@ -1,48 +1,3 @@
-
-// function readingWatcher(){
-    
-//     //Setup the setInterval method to run
-//     //every second. 1000 milliseconds = 1 second.
-//     setInterval(function(){
-//         console.log("Atualizando timestamp end de leitura na base");
-         
-//         return $.ajax({
-//             type: "POST",
-//             url: "action.php",
-//             data: { "action": 'updatereading'}
-//         }).then(function(data){
-//             data = JSON.parse(data);
-
-//             if(data.status === "success") {
-                
-//                 return data;
-
-//             } else if (data.status === 'error') {
-//                     notification.addNotification({
-//                         message: data.reason,
-//                         type: "error"
-//                     });
-//                     if (data.log){
-//                         console.error(data.log);
-//                     }
-//                     setTimeout(function(){
-//                     let notificationpanel = document.getElementById("user-notifications");
-//                     while (notificationpanel.hasChildNodes()) {  
-//                         notificationpanel.removeChild(notificationpanel.firstChild);
-//                     } 
-//                     }, 6000);
-//             }
-//             return {'status':'error'};
-//         });
-        
-
-//     }, 5000);
-// }
-
-// readingWatcher();
-
-
-
 /**
  * Function removes the spacing between tab navigation and document tool bar
  *
@@ -569,13 +524,25 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                 });
             },
 
-            updateReading(pageNumber, pattern){
+            getQuestions2(documentId, pageNumber){
                 return $.ajax({
                     type: "POST",
                     url: "action.php",
-                    data: { "page_Number": pageNumber, "action": 'getQuestions', "pattern": pattern, sesskey: M.cfg.sesskey}
+                    data: { "documentId": documentId, "action": 'updatereading', sesskey: M.cfg.sesskey}
                 }).then(function(data){
-                    return JSON.parse(data);
+                    // console.log(data);
+                    // return JSON.parse(data);
+                });
+            },
+
+            getQuestions3(documentId, pageNumber){
+                return $.ajax({
+                    type: "POST",
+                    url: "action.php",
+                    data: { "documentId": documentId, "action": 'stopreading', sesskey: M.cfg.sesskey}
+                }).then(function(data){
+                    // console.log(data);
+                    // return JSON.parse(data);
                 });
             },
 
@@ -1062,9 +1029,10 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
               if(_annoid !== null){
                   UI.pickAnnotation(_page,_annoid,_commid);
               }else{
-                  renderQuestions();
-                //   UI.registerReading(documentId, _page);
+                  UI.renderAllQuestions(documentId, _page);
               }
+              activityWatcher(documentId);
+              registerReadingLoop(documentId);
               
               setTimeout(UI.loadNewAnnotations, 5000);
             });
@@ -1080,15 +1048,69 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
           });
 	}
         
-    function renderQuestions() {
-
+    function registerReadingLoop(documentId) {
+        
         setInterval(function(){
-            UI.renderAllQuestions(documentId, _page);
-        }, 5000);
+            UI.registerReading(documentId);
+            
+        }, 1000);
 
 
         
     }
+
+    function activityWatcher(documentId){
+
+        //The number of seconds that have passed
+        //since the user was active.
+        var secondsSinceLastActivity = 0;
+    
+        //Five minutes. 60 x 5 = 300 seconds.
+        var maxInactivity = (10);
+    
+        //Setup the setInterval method to run
+        //every second. 1000 milliseconds = 1 second.
+        setInterval(function(){
+            secondsSinceLastActivity++;
+            console.log(secondsSinceLastActivity + ' seconds since the user was last active');
+            //if the user has been inactive or idle for longer
+            //then the seconds specified in maxInactivity
+            if(secondsSinceLastActivity > maxInactivity){
+                console.log('User has been inactive for more than ' + maxInactivity + ' seconds');
+                //Redirect them to your logout.php page.
+                //location.href = 'logout.php';
+                secondsSinceLastActivity = 0;
+                UI.stopReading(documentId);
+                if(alert('Você ainda está aí? Clique em ok se desejar continuar a leitura')){}
+                else    
+                    window.location.reload(); 
+            }
+        }, 1000);
+    
+        //The function that will be called whenever a user is active
+        function activity(){
+            //reset the secondsSinceLastActivity variable
+            //back to 0
+            secondsSinceLastActivity = 0;
+        }
+    
+        //An array of DOM events that should be interpreted as
+        //user activity.
+        var activityEvents = [
+            'mousedown', 'mousemove', 'keydown',
+            'scroll', 'touchstart'
+        ];
+    
+        //add these events to the document.
+        //register the activity function as the listener parameter.
+        activityEvents.forEach(function(eventName) {
+            document.addEventListener(eventName, activity, true);
+        });
+    
+    
+    }
+
+
 	render();
         
         //initialize button allQuestions
@@ -3603,10 +3625,15 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                                 (0,_abstractFunction2.default)('getQuestions');
                             }
                         },
-                        {key:'updateReading',value:function updateReading(documentId,pageNumber,pattern){
-                                (0,_abstractFunction2.default)('updateReading');
+                        {key:'getQuestions2',value:function getQuestions2(documentId,pageNumber,pattern){
+                            (0,_abstractFunction2.default)('getQuestions2');
                             }
                         },
+                        {key:'getQuestions3',value:function getQuestions3(documentId,pageNumber,pattern){
+                            (0,_abstractFunction2.default)('getQuestions3');
+                            }
+                        },
+                        
                         /**
                         * Get all the questions of one page
                         *
@@ -3618,11 +3645,16 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                                 (0,_abstractFunction2.default)('getQuestions');
                             }
                         },
+                        {key:'__getQuestions2',value:function getQuestions2(documentId,pageNumber,pattern){
+                            (0,_abstractFunction2.default)('getQuestions2');
+                            }
+                        },
+                        {key:'__getQuestions3',value:function getQuestions3(documentId,pageNumber,pattern){
+                            (0,_abstractFunction2.default)('getQuestions3');
+                            }
+                        },
 
-                        {key:'__updateReading',value:function updateReading(documentId,pageNumber,pattern){
-                            (0,_abstractFunction2.default)('updateReading');
-                        }
-                    },
+                        
                        /**
                         * Add a new comment
                         *
@@ -5051,7 +5083,7 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             var _shortText = __webpack_require__(39);
             var _newAnnotations = __webpack_require__(40);
             var _ajaxloader=__webpack_require__(36);
-            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, registerReading: _questionsRenderer.registerReading, shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
+            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, registerReading: _questionsRenderer.registerReading, stopReading: _questionsRenderer.stopReading, shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
             module.exports=exports['default'];
     /***/},
     /** 29 */
@@ -6920,6 +6952,7 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             exports.renderQuestions=renderQuestions;
             exports.renderAllQuestions = renderAllQuestions;
             exports.registerReading = registerReading;
+            exports.stopReading = stopReading;
             var _event=__webpack_require__(4);
             var _shortText=__webpack_require__(39);     
             var _PDFJSAnnotate=__webpack_require__(1);
@@ -7105,18 +7138,12 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                 }); 
             }
 
-            function registerReading () {
-                // console.log("registerReading");
-                // _PDFJSAnnotate2.default.getStoreAdapter().getQuestions(documentId).then(function(questions){
-                    
-                    
-                // }, function (err){
-                //     notification.addNotification({
-                //         message: M.util.get_string('error:registerReading', 'pdfannotator'),
-                //         type: "error"
-                //     });
-                // });
-                
+            function registerReading (documentId) {
+                _PDFJSAnnotate2.default.getStoreAdapter().getQuestions2(documentId);
+            }
+
+            function stopReading (documentId) {
+                _PDFJSAnnotate2.default.getStoreAdapter().getQuestions3(documentId);
             }
         },
     /* 39 *//*OWN Module! To shorten a specific text*/

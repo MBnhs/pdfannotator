@@ -55,23 +55,65 @@ require_sesskey();
 /* * ****************************************** Update a reading ****************************************** */
 
 if ($action === 'updatereading') {
+    
     session_start();
     $readingid = $_SESSION["readingid"];
-
-    if ($readingid) {
-        $result = pdfannotator_readings::update($readingid);
     
-        // 5. If the updated data received from the Store Adapter could successfully be inserted in db, send it back for display.
-        if ($result['status'] == 'success') {
-            echo json_encode($result);
-        } else {
-            echo json_encode(['status' => 'error']);
-        }
-    } else {
-        echo json_encode(['status' => 'error']);
-    }
+    global $DB, $USER;
+
+        $date = new DateTime();
+
+        $reading = $DB->get_record('pdfannotator_readings', ['id' => $readingid]);
+        if ($reading) {
+
+            $reading->end = $date->getTimestamp();
+            $success = $DB->update_record('pdfannotator_readings', $reading);
+            $result = array('questions' => '123', 'pdfannotatorname' => '$pdfannotatorname');
+            // echo json_encode($result);
+            
+        } //else {
+        //     $date = new DateTime();
+
+        //     $obj = new stdClass();
+        //     $obj->start = $date->getTimestamp();
+        //     $obj->end = '';
+        //     $obj->pdfannotatorid = $documentid;
+
+        //     global $DB;
+        //     $readingid = $DB->insert_record('pdfannotator_readings', $obj, true, false);
+        //     session_start();
+        //     $_SESSION["readingid"]=$readingid;
+        // }
+    // session_start();
+    // $readingid = $_SESSION["readingid"];
+
+    // if ($readingid) {
+    //     $result = pdfannotator_readings::update($readingid);
+    
+    //     // 5. If the updated data received from the Store Adapter could successfully be inserted in db, send it back for display.
+    //     if ($result['status'] == 'success') {
+    //         echo json_encode($result);
+    //     } else {
+    //         echo json_encode(['status' => 'error']);
+    //     }
+    // } else {
+    //     echo json_encode(['status' => 'error']);
+    // }
 }
 
+if ($action === 'stopreading') {
+    // $date = new DateTime();
+
+    // $obj = new stdClass();
+    // $obj->start = $date->getTimestamp();
+    // $obj->end = '';
+    // $obj->pdfannotatorid = $documentid;
+
+    // global $DB;
+    // $readingid = $DB->insert_record('pdfannotator_readings', $obj, true, false);
+    // session_start();
+    $_SESSION["readingid"]=null;
+}
 
 /* * ****************************************** 1. HANDLING ANNOTATIONS ****************************************** */
 /* * ************************************************************************************************************* */
@@ -342,20 +384,6 @@ if ($action === 'getQuestions') {
         $questions = pdfannotator_comment::get_questions($documentid, $pageid, $context);
         echo json_encode($questions);
     }
-    session_start();
-    $readingid = $_SESSION["readingid"];
-    
-    global $DB, $USER;
-
-        $date = new DateTime();
-
-        $reading = $DB->get_record('pdfannotator_readings', ['id' => $readingid]);
-        if ($reading) {
-
-            $reading->end = $date->getTimestamp();
-            $success = $DB->update_record('pdfannotator_readings', $reading);
-            
-        }
 }
 
 if ($action === 'update123') {

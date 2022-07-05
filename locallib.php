@@ -106,7 +106,7 @@ function pdfannotator_display_embed($pdfannotator, $cm, $course, $file, $page = 
 
     $obj = new stdClass();
     $obj->start = $date->getTimestamp();
-    $obj->end = '';
+    $obj->end = $date->getTimestamp();
     $obj->pdfannotatorid = $pdfannotator->id;
     
     //echo gmdate("Y-m-d\TH:i:s\Z", $obj->start);
