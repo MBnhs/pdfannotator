@@ -546,6 +546,28 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                 });
             },
 
+            registerMouseMovement(documentId, pageNumber, userId, start, end){
+                return $.ajax({
+                    type: "POST",
+                    url: "action.php",
+                    data: { "documentId": documentId, "pageNumber": pageNumber, "userId": userId, "start": start, "end": end,"action": 'registerMouseMovement', sesskey: M.cfg.sesskey}
+                }).then(function(data){
+                    console.log(data);
+                    // return JSON.parse(data);
+                });
+            },
+
+            registerMouseScroll(documentId, pageNumber, userId, start, end){
+                return $.ajax({
+                    type: "POST",
+                    url: "action.php",
+                    data: { "documentId": documentId, "pageNumber": pageNumber, "userId": userId, "start": start, "end": end,"action": 'registerMouseScroll', sesskey: M.cfg.sesskey}
+                }).then(function(data){
+                    console.log(data);
+                    // return JSON.parse(data);
+                });
+            },
+
             /**
              * Get all information about an annotation. This function only retrieves information about annotations of types 'drawing' and 'textbox'.
              * @param {type} documentId
@@ -1031,7 +1053,9 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
               }else{
                   UI.renderAllQuestions(documentId, _page);
               }
-              activityWatcher(documentId);
+            //   activityWatcher(documentId);
+              mouseWatcher(documentId);
+              mouseScrollWatcher(documentId);
               registerReadingLoop(documentId);
               
               setTimeout(UI.loadNewAnnotations, 5000);
@@ -1080,10 +1104,10 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                 //Redirect them to your logout.php page.
                 //location.href = 'logout.php';
                 secondsSinceLastActivity = 0;
-                UI.stopReading(documentId);
-                if(alert('Você ainda está aí? Clique em ok se desejar continuar a leitura')){}
-                else    
-                    window.location.reload(); 
+                // UI.stopReading(documentId);
+                // if(alert('Você ainda está aí? Clique em ok se desejar continuar a leitura')){}
+                // else    
+                //     window.location.reload(); 
             }
         }, 1000);
     
@@ -1105,6 +1129,62 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
         //register the activity function as the listener parameter.
         activityEvents.forEach(function(eventName) {
             document.addEventListener(eventName, activity, true);
+        });
+    
+    
+    }
+
+    function mouseWatcher(documentId){
+        var timeout;
+        var timestampstart;
+        var timestampend;
+
+        function mouseMovement(){
+            timestampstart = new Date().getTime();
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(mouseStop, 150);
+        }
+
+        function mouseStop() {
+            timestampend = new Date().getTime();
+            console.log("chamando backend, movement");
+            UI.registerMouseMovement(documentId, document.getElementById('currentPage').value, _userid, timestampstart, timestampend);
+        }
+
+        var activityEvents = [
+            'mousemove'
+        ];
+    
+        activityEvents.forEach(function(eventName) {
+            document.addEventListener(eventName, mouseMovement, true);
+        });
+    
+    
+    }
+
+    function mouseScrollWatcher(documentId){
+        var timeout;
+        var timestampstart;
+        var timestampend;
+
+        function mouseScroll(){
+            timestampstart = new Date().getTime();
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(mouseStop, 150);
+        }
+
+        function mouseStop() {
+            timestampend = new Date().getTime();
+            console.log("chamando backend, scroll");
+            UI.registerMouseScroll(documentId, document.getElementById('currentPage').value, _userid, timestampstart, timestampend);
+        }
+
+        var activityEvents = [
+            'scroll'
+        ];
+    
+        activityEvents.forEach(function(eventName) {
+            document.addEventListener(eventName, mouseScroll, true);
         });
     
     
@@ -3633,6 +3713,15 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                             (0,_abstractFunction2.default)('getQuestions3');
                             }
                         },
+                        {key:'registerMouseMovement',value:function registerMouseMovement(documentId,pageNumber, userId, start, end, pattern){
+                            (0,_abstractFunction2.default)('registerMouseMovement');
+                            }
+                        },
+
+                        {key:'registerMouseScroll',value:function registerMouseScroll(documentId,pageNumber, userId, start, end, pattern){
+                            (0,_abstractFunction2.default)('registerMouseScroll');
+                            }
+                        },
                         
                         /**
                         * Get all the questions of one page
@@ -3651,6 +3740,15 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
                         },
                         {key:'__getQuestions3',value:function getQuestions3(documentId,pageNumber,pattern){
                             (0,_abstractFunction2.default)('getQuestions3');
+                            }
+                        },
+                        {key:'__registerMouseMovement',value:function registerMouseMovement(documentId,pageNumber, userId, start, end,pattern){
+                            (0,_abstractFunction2.default)('registerMouseMovement');
+                            }
+                        },
+
+                        {key:'__registerMouseScroll',value:function registerMouseScroll(documentId,pageNumber, userId, start, end,pattern){
+                            (0,_abstractFunction2.default)('registerMouseScroll');
                             }
                         },
 
@@ -5083,7 +5181,8 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             var _shortText = __webpack_require__(39);
             var _newAnnotations = __webpack_require__(40);
             var _ajaxloader=__webpack_require__(36);
-            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, registerReading: _questionsRenderer.registerReading, stopReading: _questionsRenderer.stopReading, shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
+            exports.default={addEventListener:_event.addEventListener,removeEventListener:_event.removeEventListener,fireEvent:_event.fireEvent,disableEdit:_edit.disableEdit,enableEdit:_edit.enableEdit,disablePen:_pen.disablePen,enablePen:_pen.enablePen,setPen:_pen.setPen,disablePoint:_point.disablePoint,enablePoint:_point.enablePoint,disableRect:_rect.disableRect,enableRect:_rect.enableRect,disableText:_text.disableText,enableText:_text.enableText,setText:_text.setText,createPage:_page.createPage,renderPage:_page.renderPage,showLoader:_ajaxloader.showLoader,hideLoader:_ajaxloader.hideLoader,pickAnnotation:_pickAnno.pickAnnotation, renderQuestions:_questionsRenderer.renderQuestions, renderAllQuestions: _questionsRenderer.renderAllQuestions, registerReading: _questionsRenderer.registerReading, stopReading: _questionsRenderer.stopReading, registerMouseMovement: _questionsRenderer.registerMouseMovement, 
+                registerMouseScroll: _questionsRenderer.registerMouseScroll,shortenTextDynamic:_shortText.shortenTextDynamic, mathJaxAndShortenText:_shortText.mathJaxAndShortenText, loadNewAnnotations : _newAnnotations.load};
             module.exports=exports['default'];
     /***/},
     /** 29 */
@@ -6953,6 +7052,8 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             exports.renderAllQuestions = renderAllQuestions;
             exports.registerReading = registerReading;
             exports.stopReading = stopReading;
+            exports.registerMouseMovement = registerMouseMovement;
+            exports.registerMouseScroll = registerMouseScroll;
             var _event=__webpack_require__(4);
             var _shortText=__webpack_require__(39);     
             var _PDFJSAnnotate=__webpack_require__(1);
@@ -7145,6 +7246,17 @@ function startIndex(Y,_cm,_documentObject,_userid,_capabilities, _toolbarSetting
             function stopReading (documentId) {
                 _PDFJSAnnotate2.default.getStoreAdapter().getQuestions3(documentId);
             }
+
+            function registerMouseMovement (documentId, pageNumber, userId, start, end) {
+
+                _PDFJSAnnotate2.default.getStoreAdapter().registerMouseMovement(documentId, pageNumber, userId, start, end);
+            }
+
+            function registerMouseScroll (documentId, pageNumber, userId, start, end) {
+
+                _PDFJSAnnotate2.default.getStoreAdapter().registerMouseScroll(documentId, pageNumber, userId, start, end);
+            }
+
         },
     /* 39 *//*OWN Module! To shorten a specific text*/
     /***/function(module,exports,__webpack_require__){

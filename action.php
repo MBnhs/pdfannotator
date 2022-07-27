@@ -115,6 +115,64 @@ if ($action === 'stopreading') {
     $_SESSION["readingid"]=null;
 }
 
+if ($action === 'registerMouseMovement') {
+    
+    $userId = required_param('userId', PARAM_INT);
+    $documentId = required_param('documentId', PARAM_INT);
+    $start = required_param('start', PARAM_INT);
+    $end = required_param('end', PARAM_INT);
+    $page = required_param('pageNumber', PARAM_INT);
+
+    $obj = new stdClass();
+    $obj->start = $start;
+    $obj->end = $end;
+    $obj->pdfannotatorid = $documentId;
+    $obj->userid = $userId;
+    $obj->page = $page;
+    $obj->actionid = 1;
+
+    // // $obj->start = $date->getTimestamp();
+    // // $obj->end = '';
+    // // $obj->pdfannotatorid = $documentid;
+
+    global $DB;
+    $actionid = $DB->insert_record('pdfannotator_actions', $obj, true, false);
+    // session_start();
+    
+    
+    // $data = array('documentId' => $documentid, 'pageNumber' => $page);
+    echo json_encode($actionid);
+}
+
+if ($action === 'registerMouseScroll') {
+    
+    $userId = required_param('userId', PARAM_INT);
+    $documentId = required_param('documentId', PARAM_INT);
+    $start = required_param('start', PARAM_INT);
+    $end = required_param('end', PARAM_INT);
+    $page = required_param('pageNumber', PARAM_INT);
+
+    $obj = new stdClass();
+    $obj->start = $start;
+    $obj->end = $end;
+    $obj->pdfannotatorid = $documentId;
+    $obj->userid = $userId;
+    $obj->page = $page;
+    $obj->actionid = 2;
+
+    // // $obj->start = $date->getTimestamp();
+    // // $obj->end = '';
+    // // $obj->pdfannotatorid = $documentid;
+
+    global $DB;
+    $actionid = $DB->insert_record('pdfannotator_actions', $obj, true, false);
+    // session_start();
+    
+    
+    // $data = array('documentId' => $documentid, 'pageNumber' => $page);
+    echo json_encode($actionid);
+}
+
 /* * ****************************************** 1. HANDLING ANNOTATIONS ****************************************** */
 /* * ************************************************************************************************************* */
 
